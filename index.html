@@ -242,7 +242,7 @@
                 
             return (
                 <div>
-                    <h1>Todo List</h1>
+                    <h1>Numeric Input</h1>
                     <input
                         type='number'
                         pattern="[0-9]*"
@@ -250,11 +250,11 @@
                         max="1000000"
                         id='name'
                         value={name}
-                        placeholder='Add Todo'
+                        placeholder='Enter number'
                         onChange={handleChange}
                     />
                     
-                    <button onClick={addItem}>Add Todo</button>
+                    <button onClick={addItem}>Add</button>
                     <ListHooks items={todos} remove={removeItem} toggle={toggleItem} /> 
                 </div>                       
             )
