@@ -291,7 +291,6 @@
             const [previousValue, setPreviousValue] = React.useState(0)
             const [leastSignificantDigitPosition, setLeastSignificantDigitPosition] = React.useState(getLeastSignificantDigitPosition(name))
 
-
             const handleChange = (event) => {
                 const value = parseFloat(event.target.value)
                 const leastSignificantDigitPosition = getLeastSignificantDigitPosition(value);
@@ -299,8 +298,6 @@
                 setLeastSignificantDigitPosition(getLeastSignificantDigitPosition(value))
                 setName(value)
             }
-
- 
 
             const handleIncrement = (isIncrement) => {
                 if (isIncrement && name < 0 && previousValue) {
@@ -329,7 +326,8 @@
             const removeItem = (item) => dispatch(handleDeleteTodo(item))
             
             return (
-                <div className="container">
+                <div>
+                    <div className="container">
                     <h1>Numeric Input</h1>
                     <input
                         type='number'
@@ -344,8 +342,9 @@
                     <Spinner cb={(isIncrement) => handleIncrement(isIncrement)}  />
             
                     <button onClick={addItem}>Add</button>
-                    <ListHooks items={todos} remove={removeItem} toggle={toggleItem} /> 
-                </div>                       
+                </div>
+                <ListHooks items={todos} remove={removeItem} toggle={toggleItem} /> 
+                </div>                                       
             )
        }
 

@@ -1,12 +1,5 @@
-
  
-
- 
-
- 
-
 html, body, #app {
-
     --slate: rgb(66, 104, 124);
     --white: rgb(255, 255, 255);
     --orangered: rgb(255, 69, 0);
@@ -17,28 +10,23 @@ html, body, #app {
     background-color: var(--white);
 }
 
- 
-
 body {
-
     font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;
-
 }
-
  
-
 h1, h3, input, button, li {
-    width: 40%;
+    width: 60%;
     font-size: 20px;
     margin: 2px;
 }
  
 input {
     text-align: right;
-    margin-left: 0px;
+    margin-left: -20px;
     margin-right: 4px;
     padding-right: 4px;
     font-size: 30px;
+    letter-spacing: 0.5px;
     border: solid var(--slate) 1px;
 } 
 
