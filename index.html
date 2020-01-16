@@ -1,6 +1,9 @@
 <html lang="en">
+
         <!DOCTYPE html>
+
 <head>
+
     <title>Numeric Input</title>
     <script src='http://cdnjs.cloudflare.com/ajax/libs/redux/3.7.2/redux.min.js'></script>
     <script src='https://unpkg.com/react@16.7.0-alpha.0/umd/react.development.js'></script>
@@ -15,17 +18,18 @@
     <div id='app'></div>
     <hr />
     <div id='root'></div>
-
     <script type='text/javascript'>
 
         // App code
         const ADD_TODO = 'ADD_TODO'
         const REMOVE_TODO = 'REMOVE_TODO'
         const TOGGLE_TODO = 'TOGGLE_TODO'
+
         const ADD_GOAL = 'ADD_GOAL'
         const REMOVE_GOAL = 'REMOVE_GOAL'
+
         const RECEIVE_DATA = 'RECEIVE_DATA'   
-    
+
         const addTodoAction = (todo) =>  {
             return {
                 type: ADD_TODO,
@@ -39,7 +43,7 @@
                 id
             }
         }
-        
+
         const toggleTodoAction = (id) => {
             return {
                 type: TOGGLE_TODO,
@@ -79,7 +83,7 @@
                   .catch(()=> alert(`An error has occurred. Try again.`))
             }
         }
-
+ 
         const handleToggle = (id) => {
             return (dispatch) => {
                 dispatch(toggleTodoAction(id))
@@ -90,7 +94,7 @@
                     })
             }
         }
-
+ 
         const handleDeleteTodo = (todo) => {
             return (dispatch) => {
                 dispatch(remoteTodoAction(todo.id))
@@ -101,7 +105,7 @@
                 })
             } 
         }
-
+ 
         const handleAddGoal = (name, cb) => {
             return (dispatch) => {
                 return API.saveGoal(name)
@@ -123,7 +127,7 @@
                     })
             }
         }
-
+ 
         const handleInitialData = () => {
             return (dispatch) => {
                return Promise.all([
@@ -135,6 +139,7 @@
                     .catch(()=> alert(`An error occured. Try again.`))               
             }
         }
+
 
         const checker = (store) => (next) => (action) => {
             if (action.type === ADD_TODO &&
@@ -172,6 +177,7 @@
                     )
                 case RECEIVE_DATA:
                     return action.todos
+
                 default:
                     return state;
             }
@@ -181,10 +187,13 @@
             switch (action.type) {
                 case ADD_GOAL:
                     return state.concat([action.goal])
+
                 case REMOVE_GOAL:
                     return state.filter((goal) => goal.id !== action.id)
+
                 case RECEIVE_DATA:
                     return action.goals
+
                 default:
                     return state
             }
@@ -194,6 +203,7 @@
             switch(action.type) {
                 case RECEIVE_DATA:
                     return false
+
                 default:
                     return state
             }
@@ -204,10 +214,60 @@
             goals,
             loading
         }), Redux.applyMiddleware(ReduxThunk.default, checker, logger))
-    
     </script>
     <!-- React Hooks -->
     <script type='text/babel'>
+
+        const getLeastSignificantDigitPosition = (value) => {
+            value = parseInt(value)
+            value = Math.abs(value)
+
+            let leastSignificantPosition = 0
+
+            if (value > 0) {
+                let floor = 0
+                while (value > (floor = Math.floor(value))) {
+                    leastSignificantPosition = leastSignificantPosition - 1
+                    value = (value - floor) * 10;
+                }
+
+                console.log(`lsd ${value} pos ${leastSignificantPosition}`)
+
+                while (value % 10 === 0) {
+                    leastSignificantPosition = leastSignificantPosition + 1
+                    value /= 10
+                }
+
+                console.log(`lsd ${value} pos ${leastSignificantPosition}`)
+            }
+
+            return leastSignificantPosition
+        }
+
+        const incrementDecrement = (value, incrementValue = 1000000, doIncrement = true, leastSignificantDigitPosition) => {
+            
+            //const leastSignificantDigitPosition = getLeastSignificantDigitPosition(value);
+            const incrementAmount = Math.pow(10, leastSignificantDigitPosition);
+            console.log(`velocity-js-core pow incrementAmount ${incrementAmount} - 10 - 
+                leastSignificantDigitPosition ${leastSignificantDigitPosition} ${incrementValue}`)
+
+            //const currIncrementvalue = Math.min(incrementAmount, incrementValue)
+            const newValue = value + (doIncrement ? +incrementAmount : -incrementAmount);
+            console.log(`velocity-js-core incrementDecrement value ${value} incrementValue ${incrementValue} new Value ${newValue}`);
+
+            return newValue;
+        }
+
+
+        const Spinner = ({ cb}) => {
+            return (
+               <span className="spinner">
+                <span className="arrow-up" onClick={() => cb(true)}></span>
+                <span className="arrow-down" onClick={() =>cb(false)}></span>
+            </span>
+            )
+        }
+
         const ListHooks = ({items, remove, toggle}) => {
             return (
                 <ul>
@@ -218,81 +278,59 @@
                         style={{textDecoration: item.complete ? 'line-through' : 'none'}}>
                         {item.name}
                         </span>
+
                         <button onClick={() => remove(item)}>X</button>
                         </li>
                     ))}  
                 </ul>
             )
         }
-        
-        const getLeastSignificantDigitPosition = (value) => {
-            value = Math.abs(value);
-            let leastSignificantPosition = 0;
-
-            if (value > 0) {
-                let floor;
-
-                while (value > (floor = Math.floor(value))) {
-                    leastSignificantPosition--;
-                    value = (value - floor) * 10;
-                }
-
-                while (value % 10 === 0) {
-                    leastSignificantPosition++;
-                    value /= 10;
-                }
-
-            }
-
-            return leastSignificantPosition;
-        }
-
-        const incrementDecrement = (value, doIncrement = true) => {
-
-            const a = Math.pow(10, getLeastSignificantDigitPosition(value));
-            const b = Math.min(value, a)
-            console.log(`incrementDecrement incrementValue ${b}`);
-
-            return value + (doIncrement ? +b : -b);
-        }
-
-
-        const increment = (value) => {
-            const floatValue =  parseFloat(value)
-            // const length = Math.log10(floatValue)
-            // const incValue = floatValue + Math.pow(10, length);
-
-            // console.log(`'increment value: ${value} ' incValue ${incValue}`);
  
-            // return Math.round(incValue);
-            const incValue = incrementDecrement(floatValue)
-            console.log(`'increment value: ${floatValue} ' incValue ${incValue}`);
-            return floatValue
-        }
-
         const TodosHooks = ({ todos, dispatch }) => {
-            const [name, setName] = React.useState('1000000')
+            const [name, setName] = React.useState(1000000)
+            const [previousValue, setPreviousValue] = React.useState(0)
+            const [leastSignificantDigitPosition, setLeastSignificantDigitPosition] = React.useState(getLeastSignificantDigitPosition(name))
+
+
             const handleChange = (event) => {
-                const value = increment(event.target.value)
+                const value = parseFloat(event.target.value)
+                const leastSignificantDigitPosition = getLeastSignificantDigitPosition(value);
+                console.log(`velocity-js-core incrementDecrement value ${value} leastSignificantDigitPosition ${leastSignificantDigitPosition} `);
+                setLeastSignificantDigitPosition(getLeastSignificantDigitPosition(value))
                 setName(value)
             }
+
+ 
+
+            const handleIncrement = (isIncrement) => {
+                if (isIncrement && name < 0 && previousValue) {
+                    setName(previousValue)
+                } else {
+                    const newValue = incrementDecrement(name, 1000000, isIncrement, leastSignificantDigitPosition);
+                    if (newValue < 0) {
+                        return
+                    }
+                    setPreviousValue(name)
+                    setName(newValue)
+                }
+            }
+
             const addItem = (e) => {
                 e.preventDefault()
-                
                 dispatch(handleAddTodo(
                     name,
                     () =>  setName('')                     
                 ))
             }
-
+ 
             const toggleItem = (id) => dispatch(handleToggle(id))
             const removeItem = (item) => dispatch(handleDeleteTodo(item))
-                
+            
             return (
-                <div>
+                <div className="container">
                     <h1>Numeric Input</h1>
                     <input
-                        type='number'
+                        type='text'
                         pattern="[0-9]*"
                         min="0"
                         max="10000000"
@@ -301,18 +339,20 @@
                         placeholder='Enter number'
                         onChange={handleChange}
                     />
-                    
+                    <Spinner cb={(isIncrement) => handleIncrement(isIncrement)}  />
+            
                     <button onClick={addItem}>Add</button>
                     <ListHooks items={todos} remove={removeItem} toggle={toggleItem} /> 
                 </div>                       
             )
        }
 
+
        const ConnectedTodosHooks = ReactRedux.connect((state, dispatch)=> ({
            todos: state.todos, 
            dispatch
        }))(TodosHooks)
-       
+
         const GoalsHooks = ({ goals, dispatch }) => {
             const [name, setName ] = React.useState('')
             const handleChange = (e) => setName(e.target.value)
@@ -357,20 +397,19 @@
             // componentDidMount () {
                 React.useEffect(() => {
                     // dispatch(handleInitialData())
-                    
                 }, initLoad)
-               
+
             if (!loading) {
                 return <h3>Loading ...</h3>
             }
-            
+        
             return (
                 <div>
                     <ConnectedTodosHooks/>
                 </div>
             )
         }
-
+ 
         const ConnectedAppHooks = ReactRedux.connect((state, dispatch) => ({
             loading: state.loading,
             dispatch
@@ -383,5 +422,5 @@
             document.getElementById('root')
         )
     </script>
-</html>
 </body>
+</html>
