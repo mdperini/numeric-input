@@ -317,8 +317,10 @@
 
             const addItem = (e) => {
                 e.preventDefault()
+                const value = name.toString()
+                console.log(`addItem value ${value}`);
                 dispatch(handleAddTodo(
-                    name,
+                    value,
                     () =>  setName('')                     
                 ))
             }
@@ -330,7 +332,7 @@
                 <div className="container">
                     <h1>Numeric Input</h1>
                     <input
-                        type='text'
+                        type='number'
                         pattern="[0-9]*"
                         min="0"
                         max="10000000"
