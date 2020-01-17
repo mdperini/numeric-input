@@ -232,29 +232,19 @@
                 value = (value - floor) * 10;
             }
 
-            console.log(`lsd ${value} pos ${leastSignificantDigitPosition}`)
-
             while (value % 10 === 0) {
                 leastSignificantDigitPosition = leastSignificantDigitPosition + 1
                 value /= 10
             }
 
-            console.log(`lsd ${value} pos ${leastSignificantDigitPosition}`)
             return leastSignificantDigitPosition
         }
 
         const incrementDecrement = (value, leastSignificantDigitPosition, increment = true) => {
+            value = parseFloat(value)
             const incrementAmount = Math.pow(10, leastSignificantDigitPosition);
-            console.log(`velocity-js-core pow incrementAmount ${incrementAmount} - 10 - 
-                leastSignificantDigitPosition ${leastSignificantDigitPosition}`)
-
-            //const currIncrementvalue = Math.min(incrementAmount, incrementValue)
-            const newValue = value + (increment ? + incrementAmount : - incrementAmount);
-            console.log(`velocity-js-core incrementDecrement value ${value} lsdp ${leastSignificantDigitPosition} newValue ${newValue}`);
-
-            return newValue;
+            return value + (increment ? + incrementAmount : - incrementAmount);
         }
-
 
         const Spinner = ({ cb }) => {
             return (
@@ -284,12 +274,13 @@
                     setNumericInput(previousValue)
                 } else {
                     const newValue = incrementDecrement(numericInput, leastSignificantDigitPosition, isIncrement);
+                    console.log(`newValue ${newValue}`)
                     if (newValue < 0) {
                         return
                     }
                     setPreviousValue(numericInput)
                     setNumericInput(newValue)
-                    cb(numericInput)
+                    cb(newValue)
                 }
             }
 
