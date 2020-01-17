@@ -221,50 +221,89 @@
         const getLeastSignificantDigitPosition = (value) => {
             value = parseInt(value)
             value = Math.abs(value)
-
-            let leastSignificantPosition = 0
-
-            if (value > 0) {
-                let floor = 0
-                while (value > (floor = Math.floor(value))) {
-                    leastSignificantPosition = leastSignificantPosition - 1
-                    value = (value - floor) * 10;
-                }
-
-                console.log(`lsd ${value} pos ${leastSignificantPosition}`)
-
-                while (value % 10 === 0) {
-                    leastSignificantPosition = leastSignificantPosition + 1
-                    value /= 10
-                }
-
-                console.log(`lsd ${value} pos ${leastSignificantPosition}`)
+            if (value === 0) {
+                return
             }
 
-            return leastSignificantPosition
+            let leastSignificantDigitPosition = 0
+            let floor = 0
+            while (value > (floor = Math.floor(value))) {
+                leastSignificantDigitPosition = leastSignificantDigitPosition - 1
+                value = (value - floor) * 10;
+            }
+
+            console.log(`lsd ${value} pos ${leastSignificantDigitPosition}`)
+
+            while (value % 10 === 0) {
+                leastSignificantDigitPosition = leastSignificantDigitPosition + 1
+                value /= 10
+            }
+
+            console.log(`lsd ${value} pos ${leastSignificantDigitPosition}`)
+            return leastSignificantDigitPosition
         }
 
-        const incrementDecrement = (value, incrementValue = 1000000, doIncrement = true, leastSignificantDigitPosition) => {
-            
-            //const leastSignificantDigitPosition = getLeastSignificantDigitPosition(value);
+        const incrementDecrement = (value, leastSignificantDigitPosition, increment = true) => {
             const incrementAmount = Math.pow(10, leastSignificantDigitPosition);
             console.log(`velocity-js-core pow incrementAmount ${incrementAmount} - 10 - 
-                leastSignificantDigitPosition ${leastSignificantDigitPosition} ${incrementValue}`)
+                leastSignificantDigitPosition ${leastSignificantDigitPosition}`)
 
             //const currIncrementvalue = Math.min(incrementAmount, incrementValue)
-            const newValue = value + (doIncrement ? +incrementAmount : -incrementAmount);
-            console.log(`velocity-js-core incrementDecrement value ${value} incrementValue ${incrementValue} new Value ${newValue}`);
+            const newValue = value + (increment ? + incrementAmount : - incrementAmount);
+            console.log(`velocity-js-core incrementDecrement value ${value} lsdp ${leastSignificantDigitPosition} newValue ${newValue}`);
 
             return newValue;
         }
 
 
-        const Spinner = ({ cb}) => {
+        const Spinner = ({ cb }) => {
             return (
                <span className="spinner">
                 <span className="arrow-up" onClick={() => cb(true)}></span>
                 <span className="arrow-down" onClick={() =>cb(false)}></span>
             </span>
+            )
+        }
+
+        const NumericInput = ({ initialValue, placeHolder = 'Enter number', cb }) => {
+            const [numericInput, setNumericInput] = React.useState(initialValue)
+            const [previousValue, setPreviousValue] = React.useState(0)
+            const [leastSignificantDigitPosition, setLeastSignificantDigitPosition] = React.useState(getLeastSignificantDigitPosition(numericInput))
+
+            const handleChange = (event) => {
+                const value = parseFloat(event.target.value)
+                const leastSignificantDigitPosition = getLeastSignificantDigitPosition(value);
+                console.log(`velocity-js-core incrementDecrement value ${value} leastSignificantDigitPosition ${leastSignificantDigitPosition} `);
+                setLeastSignificantDigitPosition(getLeastSignificantDigitPosition(value))
+                setNumericInput(value)
+                cb(numericInput)
+            }
+
+            const handleIncrement = (isIncrement) => {
+                if (isIncrement && numericInput < 0 && previousValue) {
+                    setNumericInput(previousValue)
+                } else {
+                    const newValue = incrementDecrement(numericInput, leastSignificantDigitPosition, isIncrement);
+                    if (newValue < 0) {
+                        return
+                    }
+                    setPreviousValue(numericInput)
+                    setNumericInput(newValue)
+                    cb(numericInput)
+                }
+            }
+
+            return (
+                <React.Fragment>
+                    <input
+                        type='number'
+                        id='numericInput'
+                        value={numericInput}
+                        placeholder={placeHolder}
+                        onChange={handleChange}
+                    />
+                    <Spinner cb={(isIncrement) => handleIncrement(isIncrement)}  />
+                </React.Fragment>
             )
         }
 
@@ -287,31 +326,8 @@
         }
  
         const TodosHooks = ({ todos, dispatch }) => {
-            const [name, setName] = React.useState(1000000)
-            const [previousValue, setPreviousValue] = React.useState(0)
-            const [leastSignificantDigitPosition, setLeastSignificantDigitPosition] = React.useState(getLeastSignificantDigitPosition(name))
-
-            const handleChange = (event) => {
-                const value = parseFloat(event.target.value)
-                const leastSignificantDigitPosition = getLeastSignificantDigitPosition(value);
-                console.log(`velocity-js-core incrementDecrement value ${value} leastSignificantDigitPosition ${leastSignificantDigitPosition} `);
-                setLeastSignificantDigitPosition(getLeastSignificantDigitPosition(value))
-                setName(value)
-            }
-
-            const handleIncrement = (isIncrement) => {
-                if (isIncrement && name < 0 && previousValue) {
-                    setName(previousValue)
-                } else {
-                    const newValue = incrementDecrement(name, 1000000, isIncrement, leastSignificantDigitPosition);
-                    if (newValue < 0) {
-                        return
-                    }
-                    setPreviousValue(name)
-                    setName(newValue)
-                }
-            }
-
+            const [name, setName] = React.useState('')
+         
             const addItem = (e) => {
                 e.preventDefault()
                 const value = name.toString()
@@ -329,18 +345,10 @@
                 <div>
                     <div className="container">
                     <h1>Numeric Input</h1>
-                    <input
-                        type='number'
-                        pattern="[0-9]*"
-                        min="0"
-                        max="10000000"
-                        id='name'
-                        value={name}
-                        placeholder='Enter number'
-                        onChange={handleChange}
-                    />
-                    <Spinner cb={(isIncrement) => handleIncrement(isIncrement)}  />
-            
+                    <NumericInput 
+                        initialValue='100000' 
+                        placeHolder='Enter number' 
+                        cb={( newValue ) => setName(newValue)}  />
                     <button onClick={addItem}>Add</button>
                 </div>
                 <ListHooks items={todos} remove={removeItem} toggle={toggleItem} /> 
