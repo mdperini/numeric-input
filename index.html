@@ -245,12 +245,55 @@
         }
 
         const incrementDecrement = (value, leastSignificantDigitPosition, increment = true) => {
+            
             value = parseFloat(value)
             const incrementAmount = Math.pow(10, leastSignificantDigitPosition);
             return value + (increment ? + incrementAmount : - incrementAmount);
         }
-
+       
         const Spinner = ({ onSpinnerClick }) => {
+            const [incrementer, setIncrementer] = React.useState(true)
+            
+            const handleKeyDown = (event) => {
+                console.log('key down' + event)
+                return (
+                    onSpinnerClick(true)
+                )
+            }
+           
+            const handleKeyUp = (event) => {
+                console.log('key up' + event)
+                return (
+                    onSpinnerClick(true)
+                )
+            }
+           
+            React.useEffect(() => {              
+                // const hndle1 = document.addEventListener("keydown", handleKeyDown);
+                // const hndle2 =  document.addEventListener("keyup", handleKeyDown);
+                // setIncrementer(false)
+                // return () => {
+                    
+                // }
+            },[incrementer])
+           
+            const handleMouseDown = (onSpinnerClick) => {
+                console.log('mouse down')
+                // if (incrementer === null) {
+                //     const hdle = window.setInterval(() => onSpinnerClick(true), 10)
+                //     console.log('mouse down 2')
+                //     setIncrementer(hdle)
+                // }
+            }
+            
+            const handleMouseUp = (onSpinnerClick) => {
+                console.log('mouse up')
+                // if (incrementer !== null) {
+                //     window.clearInterval(incrementer)
+                //     setIncrementer(incrementer)
+                // }
+            }
+
             return (
                <span className="spinner">
                 <span className="arrow-up" onClick={() => onSpinnerClick(true)}></span>
