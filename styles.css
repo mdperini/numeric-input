@@ -57,9 +57,7 @@ button:hover {
 .spinner {
     display: flex;
     flex-direction: column;  
-    margin-top: 0px;
-    margin-left: 2px;
-    margin-right: 2px;  
+    margin: 2px;
 }
 
 .arrow-up,

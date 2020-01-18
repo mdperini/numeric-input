@@ -246,16 +246,16 @@
             return value + (increment ? + incrementAmount : - incrementAmount);
         }
 
-        const Spinner = ({ cb }) => {
+        const Spinner = ({ onSpinnerClick }) => {
             return (
                <span className="spinner">
-                <span className="arrow-up" onClick={() => cb(true)}></span>
-                <span className="arrow-down" onClick={() =>cb(false)}></span>
+                <span className="arrow-up" onClick={() => onSpinnerClick(true)}></span>
+                <span className="arrow-down" onClick={() =>onSpinnerClick(false)}></span>
             </span>
             )
         }
 
-        const NumericInput = ({ initialValue, placeHolder = 'Enter number', cb }) => {
+        const NumericInput = ({ initialValue, placeHolder = 'Enter number', onValueChanged }) => {
             const [numericInput, setNumericInput] = React.useState(initialValue)
             const [previousValue, setPreviousValue] = React.useState(0)
             const [leastSignificantDigitPosition, setLeastSignificantDigitPosition] = React.useState(getLeastSignificantDigitPosition(numericInput))
@@ -263,10 +263,9 @@
             const handleChange = (event) => {
                 const value = parseFloat(event.target.value)
                 const leastSignificantDigitPosition = getLeastSignificantDigitPosition(value);
-                console.log(`velocity-js-core incrementDecrement value ${value} leastSignificantDigitPosition ${leastSignificantDigitPosition} `);
                 setLeastSignificantDigitPosition(getLeastSignificantDigitPosition(value))
                 setNumericInput(value)
-                cb(numericInput)
+                onValueChanged(numericInput)
             }
 
             const handleIncrement = (isIncrement) => {
@@ -280,7 +279,7 @@
                     }
                     setPreviousValue(numericInput)
                     setNumericInput(newValue)
-                    cb(newValue)
+                    onValueChanged(newValue)
                 }
             }
 
@@ -293,7 +292,7 @@
                         placeholder={placeHolder}
                         onChange={handleChange}
                     />
-                    <Spinner cb={(isIncrement) => handleIncrement(isIncrement)}  />
+                    <Spinner onSpinnerClick={(isIncrement) => handleIncrement(isIncrement)}  />
                 </React.Fragment>
             )
         }
@@ -339,7 +338,7 @@
                     <NumericInput 
                         initialValue='100000' 
                         placeHolder='Enter number' 
-                        cb={( newValue ) => setName(newValue)}  />
+                        onValueChanged={( newValue ) => setName(newValue)}  />
                     <button onClick={addItem}>Add</button>
                 </div>
                 <ListHooks items={todos} remove={removeItem} toggle={toggleItem} /> 
