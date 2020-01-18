@@ -11,50 +11,13 @@
     <script src='https://unpkg.com/redux-thunk@2.2.0/dist/redux-thunk.min.js'></script>
     <script src='https://unpkg.com/react-redux@5.0.6/dist/react-redux.min.js'></script>
     <script src="https://use.fontawesome.com/69096b9f31.js"></script>
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" 
-            integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8="
-            crossorigin="anonymous">
     </script>
     <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
     <div id='root'></div>
-    <div class="jq-container">
-        <div class="input-group spinner">
-          <input type="text" class="form-control" value="42">
-          <div class="input-group-btn-vertical">
-            <div class="btn btn-default"><i class="fa fa-caret-up"></i></div>
-            <div class="btn btn-default"><i class="fa fa-caret-down"></i></div>
-          </div>
-        </div>
-      </div>
       
     <script type='text/javascript'>
-       $(document).ready(function(){
-        //Stop people from typing
-        $('.spinner input').keydown(function(e){
-            $('.spinner input').val( parseInt($('.spinner input').val(), 10) + 1);
-            // e.preventDefault();
-            // return false;
-        });
-        var minNumber = 1;
-        var maxNumber = 10;
-        $('.spinner .btn:first-of-type').on('click', function() {
-            if($('.spinner input').val() == maxNumber){
-                return false;
-            }else{
-                $('.spinner input').val( parseInt($('.spinner input').val(), 10) + 1);
-            }
-        });
-
-        $('.spinner .btn:last-of-type').on('click', function() {
-            if($('.spinner input').val() == minNumber){
-                return false;
-            }else{
-                $('.spinner input').val( parseInt($('.spinner input').val(), 10) - 1);
-            }
-        });
-    });
 
         // App code
         const ADD_TODO = 'ADD_TODO'
@@ -280,55 +243,12 @@
         }
 
         const incrementDecrement = (value, leastSignificantDigitPosition, increment = true) => {
-            
             value = parseFloat(value)
             const incrementAmount = Math.pow(10, leastSignificantDigitPosition);
             return value + (increment ? + incrementAmount : - incrementAmount);
         }
        
         const Spinner = ({ onSpinnerClick }) => {
-            const [incrementer, setIncrementer] = React.useState(true)
-            
-            const handleKeyDown = (event) => {
-                console.log('key down' + event)
-                return (
-                    onSpinnerClick(true)
-                )
-            }
-           
-            const handleKeyUp = (event) => {
-                console.log('key up' + event)
-                return (
-                    onSpinnerClick(true)
-                )
-            }
-           
-            React.useEffect(() => {              
-                // const hndle1 = document.addEventListener("keydown", handleKeyDown);
-                // const hndle2 =  document.addEventListener("keyup", handleKeyDown);
-                // setIncrementer(false)
-                // return () => {
-                    
-                // }
-            },[incrementer])
-           
-            const handleMouseDown = (onSpinnerClick) => {
-                console.log('mouse down')
-                // if (incrementer === null) {
-                //     const hdle = window.setInterval(() => onSpinnerClick(true), 10)
-                //     console.log('mouse down 2')
-                //     setIncrementer(hdle)
-                // }
-            }
-            
-            const handleMouseUp = (onSpinnerClick) => {
-                console.log('mouse up')
-                // if (incrementer !== null) {
-                //     window.clearInterval(incrementer)
-                //     setIncrementer(incrementer)
-                // }
-            }
-
             return (
                <span className="spinner">
                 <span className="arrow-up" onClick={() => onSpinnerClick(true)}></span>
@@ -337,24 +257,42 @@
             )
         }
 
+        const unSupportedInput = (event) => {
+            console.log(`event ${event.target.value}`)
+            if(!event.target.value || 
+                event.target.value === NaN || 
+                isNaN(event.target.value)) {
+                console.warn(`Input type not supported - value entered: ${event.target.value}`)
+                return true
+            }
+     
+            return false
+        }
+
         const NumericInput = ({ initialValue, placeHolder = 'Enter number', onValueChanged }) => {
             const [numericInput, setNumericInput] = React.useState(isNaN( initialValue.toString().replace(/\,/g,'') ) ?  0 : initialValue )
             const [previousValue, setPreviousValue] = React.useState(0)
             const [leastSignificantDigitPosition, setLeastSignificantDigitPosition] = React.useState(getLeastSignificantDigitPosition(numericInput.toString().replace(/\,/g,'') ))
 
             const handleOnChange = (event) => {
-                console.log(`handleOnChange  value ${event.target.value} ${event.target}`)
+                if (unSupportedInput(event)) {
+                    return
+                }
+
                 const value = parseFloat(event.target.value)
                 setLeastSignificantDigitPosition(getLeastSignificantDigitPosition(value.toString().replace(/\,/g,'')))
                 setNumericInput(value)
                 onValueChanged(value)
             }
 
-            const handleIncrement = (isIncrement) => {
+            const handleIncrementDecrement = (isIncrement) => {
                 if (isIncrement && numericInput < 0 && previousValue) {
                     setNumericInput(previousValue)
                 } else {
                     let newValue = incrementDecrement(numericInput.toString().replace(/\,/g,''), leastSignificantDigitPosition, isIncrement);
+                    if (isNaN(newValue)) {
+                        newValue = 0;
+                    }
                     console.log(`newValue ${newValue}`)
                     if (newValue < 0) {
                         return
@@ -366,14 +304,10 @@
                 }
             }
 
-            const handleKeyDown = (event) => {
-                console.log('key down pressed ' + event.key)
-                if (event.key === 'ArrowDown') {
-                    handleIncrement(false)
-                }
-
-                if (event.key === 'ArrowUp') {
-                    handleIncrement(true)
+            const handleOnKeyDown = (event) => {
+                if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                    console.log(`event.key ${event.key}`)
+                    handleIncrementDecrement(event.key === 'ArrowUp' ? true : false )
                 }
             }
 
@@ -384,10 +318,10 @@
                         id='numericInput'
                         value={numericInput}
                         placeholder={placeHolder}
-                        onKeyDown={handleKeyDown}
+                        onKeyDown={handleOnKeyDown}
                         onChange={handleOnChange}
                     />
-                    <Spinner onSpinnerClick={(isIncrement) => handleIncrement(isIncrement)}  />
+                    <Spinner onSpinnerClick={(isIncrement) => handleIncrementDecrement(isIncrement)}  />
                 </React.Fragment>
             )
         }
