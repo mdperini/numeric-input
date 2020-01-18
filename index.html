@@ -1,10 +1,8 @@
-<html lang="en">
-
-        <!DOCTYPE html>
-
+<html lang="en">        
+    <!DOCTYPE html>
 <head>
-
     <title>Numeric Input</title>
+    
     <script src='http://cdnjs.cloudflare.com/ajax/libs/redux/3.7.2/redux.min.js'></script>
     <script src='https://unpkg.com/react@16.7.0-alpha.0/umd/react.development.js'></script>
     <script src='https://unpkg.com/react-dom@16.7.0-alpha.0/umd/react-dom.development.js'></script>
@@ -12,13 +10,51 @@
     <script src='https://tylermcginnis.com/goals-todos-api/index.js'></script>
     <script src='https://unpkg.com/redux-thunk@2.2.0/dist/redux-thunk.min.js'></script>
     <script src='https://unpkg.com/react-redux@5.0.6/dist/react-redux.min.js'></script>
+    <script src="https://use.fontawesome.com/69096b9f31.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" 
+            integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8="
+            crossorigin="anonymous">
+    </script>
     <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-    <div id='app'></div>
-    <hr />
     <div id='root'></div>
+    <div class="jq-container">
+        <div class="input-group spinner">
+          <input type="text" class="form-control" value="42">
+          <div class="input-group-btn-vertical">
+            <div class="btn btn-default"><i class="fa fa-caret-up"></i></div>
+            <div class="btn btn-default"><i class="fa fa-caret-down"></i></div>
+          </div>
+        </div>
+      </div>
+      
     <script type='text/javascript'>
+       $(document).ready(function(){
+        //Stop people from typing
+        $('.spinner input').keydown(function(e){
+            $('.spinner input').val( parseInt($('.spinner input').val(), 10) + 1);
+            // e.preventDefault();
+            // return false;
+        });
+        var minNumber = 1;
+        var maxNumber = 10;
+        $('.spinner .btn:first-of-type').on('click', function() {
+            if($('.spinner input').val() == maxNumber){
+                return false;
+            }else{
+                $('.spinner input').val( parseInt($('.spinner input').val(), 10) + 1);
+            }
+        });
+
+        $('.spinner .btn:last-of-type').on('click', function() {
+            if($('.spinner input').val() == minNumber){
+                return false;
+            }else{
+                $('.spinner input').val( parseInt($('.spinner input').val(), 10) - 1);
+            }
+        });
+    });
 
         // App code
         const ADD_TODO = 'ADD_TODO'
@@ -139,7 +175,6 @@
                     .catch(()=> alert(`An error occured. Try again.`))               
             }
         }
-
 
         const checker = (store) => (next) => (action) => {
             if (action.type === ADD_TODO &&
@@ -307,7 +342,8 @@
             const [previousValue, setPreviousValue] = React.useState(0)
             const [leastSignificantDigitPosition, setLeastSignificantDigitPosition] = React.useState(getLeastSignificantDigitPosition(numericInput.toString().replace(/\,/g,'') ))
 
-            const handleChange = (event) => {
+            const handleOnChange = (event) => {
+                console.log(`handleOnChange  value ${event.target.value} ${event.target}`)
                 const value = parseFloat(event.target.value)
                 setLeastSignificantDigitPosition(getLeastSignificantDigitPosition(value.toString().replace(/\,/g,'')))
                 setNumericInput(value)
@@ -330,6 +366,17 @@
                 }
             }
 
+            const handleKeyDown = (event) => {
+                console.log('key down pressed ' + event.key)
+                if (event.key === 'ArrowDown') {
+                    handleIncrement(false)
+                }
+
+                if (event.key === 'ArrowUp') {
+                    handleIncrement(true)
+                }
+            }
+
             return (
                 <React.Fragment>
                     <input
@@ -337,7 +384,8 @@
                         id='numericInput'
                         value={numericInput}
                         placeholder={placeHolder}
-                        onChange={handleChange}
+                        onKeyDown={handleKeyDown}
+                        onChange={handleOnChange}
                     />
                     <Spinner onSpinnerClick={(isIncrement) => handleIncrement(isIncrement)}  />
                 </React.Fragment>
