@@ -218,6 +218,10 @@
     <!-- React Hooks -->
     <script type='text/babel'>
 
+        const numberWithCommas = (x) => {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
         const getLeastSignificantDigitPosition = (value) => {
             value = parseInt(value)
             value = Math.abs(value)
@@ -256,12 +260,12 @@
         }
 
         const NumericInput = ({ initialValue, placeHolder = 'Enter number', onValueChanged }) => {
-            const [numericInput, setNumericInput] = React.useState(initialValue)
+            const [numericInput, setNumericInput] = React.useState(isNaN( initialValue.toString().replace(/\,/g,'') ) ?  0 : initialValue )
             const [previousValue, setPreviousValue] = React.useState(0)
-            const [leastSignificantDigitPosition, setLeastSignificantDigitPosition] = React.useState(getLeastSignificantDigitPosition(numericInput))
+            const [leastSignificantDigitPosition, setLeastSignificantDigitPosition] = React.useState(getLeastSignificantDigitPosition(numericInput.toString().replace(/\,/g,'') ))
 
             const handleChange = (event) => {
-                const value = parseFloat(event.target.value)
+                const value = parseFloat(event.target.value.toString().replace(/\,/g,''))
                 const leastSignificantDigitPosition = getLeastSignificantDigitPosition(value);
                 setLeastSignificantDigitPosition(getLeastSignificantDigitPosition(value))
                 setNumericInput(value)
@@ -272,11 +276,12 @@
                 if (isIncrement && numericInput < 0 && previousValue) {
                     setNumericInput(previousValue)
                 } else {
-                    const newValue = incrementDecrement(numericInput, leastSignificantDigitPosition, isIncrement);
+                    let newValue = incrementDecrement(numericInput.toString().replace(/\,/g,''), leastSignificantDigitPosition, isIncrement);
                     console.log(`newValue ${newValue}`)
                     if (newValue < 0) {
                         return
                     }
+                    newValue = numberWithCommas(newValue)
                     setPreviousValue(numericInput)
                     setNumericInput(newValue)
                     onValueChanged(newValue)
@@ -286,7 +291,7 @@
             return (
                 <React.Fragment>
                     <input
-                        type='number'
+                        type='text'
                         id='numericInput'
                         value={numericInput}
                         placeholder={placeHolder}
@@ -336,9 +341,9 @@
                     <div className="container">
                     <h1>Numeric Input</h1>
                     <NumericInput 
-                        initialValue='100000' 
+                        initialValue='1,000,000' 
                         placeHolder='Enter number' 
-                        onValueChanged={( newValue ) => setName(newValue)}  />
+                        onValueChanged={( newValue ) => setName(newValue.toString())}  />
                     <button onClick={addItem}>Add</button>
                 </div>
                 <ListHooks items={todos} remove={removeItem} toggle={toggleItem} /> 
