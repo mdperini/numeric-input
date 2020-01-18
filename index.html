@@ -265,11 +265,10 @@
             const [leastSignificantDigitPosition, setLeastSignificantDigitPosition] = React.useState(getLeastSignificantDigitPosition(numericInput.toString().replace(/\,/g,'') ))
 
             const handleChange = (event) => {
-                const value = parseFloat(event.target.value.toString().replace(/\,/g,''))
-                const leastSignificantDigitPosition = getLeastSignificantDigitPosition(value);
-                setLeastSignificantDigitPosition(getLeastSignificantDigitPosition(value))
+                const value = parseFloat(event.target.value)
+                setLeastSignificantDigitPosition(getLeastSignificantDigitPosition(value.toString().replace(/\,/g,'')))
                 setNumericInput(value)
-                onValueChanged(numericInput)
+                onValueChanged(value)
             }
 
             const handleIncrement = (isIncrement) => {
@@ -281,8 +280,8 @@
                     if (newValue < 0) {
                         return
                     }
-                    newValue = numberWithCommas(newValue)
                     setPreviousValue(numericInput)
+                    newValue = numberWithCommas(newValue)
                     setNumericInput(newValue)
                     onValueChanged(newValue)
                 }
